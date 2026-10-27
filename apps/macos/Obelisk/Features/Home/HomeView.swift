@@ -91,7 +91,7 @@ struct HomeView: View {
         // An overlay rather than a safe area bar, as a library's.
         .overlay(alignment: .top) {
             HomeBar(model: model, bar: bar, game: openGame.map { ($0.title, $0.section) }, back: back,
-                    openLibrary: openLibrary)
+                    openLibrary: model.show)
         }
         .environment(\.storefrontBar, bar)
         .environment(\.gameTransition, GameTransition(namespace: namespace, source: source, card: card))
@@ -128,23 +128,7 @@ struct HomeView: View {
     }
 
     private func back() {
-        withAnimation(ObeliskStyle.pageAnimation(reduceMotion: reduceMotion)) { closeGame() }
-    }
-
-    /// Leaves the game's page for its storefront's library.
-    private func openLibrary(_ section: LibrarySection) {
-        closeGame()
-        model.selection = section
-    }
-
-    private func closeGame() {
-        switch model.homeGame?.section {
-        case .steam: model.steam.closeGame()
-        case .epic: model.epic.closeGame()
-        case .gog: model.gog.closeGame()
-        default: break
-        }
-        model.homeGame = nil
+        withAnimation(ObeliskStyle.pageAnimation(reduceMotion: reduceMotion)) { model.closeHomeGame() }
     }
 }
 

@@ -175,6 +175,35 @@ final class AppModel {
         model.open(game)
     }
 
+    /// Shows the section the sidebar picked at its first page: Home or the
+    /// library, not the game page left open in it.
+    /// The sidebar asks twice for one click, so asking again changes nothing.
+    func show(_ section: LibrarySection) {
+        if selection != section { selection = section }
+        if section == .home { closeHomeGame() } else { closeGame(of: section) }
+    }
+
+    /// Returns Home from the game page it opened.
+    func closeHomeGame() {
+        if let section = homeGame?.section { closeGame(of: section) }
+    }
+
+    /// Returns a storefront from its game page, which Home shows too when it
+    /// opened it.
+    private func closeGame(of section: LibrarySection) {
+        switch section {
+        case .steam: closeGame(in: steam)
+        case .epic: closeGame(in: epic)
+        case .gog: closeGame(in: gog)
+        case .home, .settings: return
+        }
+        if homeGame?.section == section { homeGame = nil }
+    }
+
+    private func closeGame<Model: LibraryStorefront>(in model: Model) {
+        if model.selectedGame != nil { model.closeGame() }
+    }
+
     /// The installed games outside the games folder: their move was stopped,
     /// or they were installed meanwhile. Two accounts' installations of one
     /// folder count once.
