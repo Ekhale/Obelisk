@@ -17,6 +17,9 @@
 #   --pass NAME               this script's variable NAME, when set, as a variable of the guest
 # OBELISK_APP_NAME names the game in the menu bar, the Dock and Cmd-Tab.
 set -u
+# The Steam host's discovery adapter is for macOS games; no process here needs it. On a Mac with SIP off, dyld also
+# inserts it into the system tools this script runs (mkdir, tr, tail), which are arm64e and abort without that slice.
+unset DYLD_INSERT_LIBRARIES
 runtime=$1 home=$2 install=$3 cwd=$4
 shift 4
 graphics=dxmt binds= guest_env=()
