@@ -2,6 +2,11 @@
 use std::io::{Read, Write};
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
+/// The native Steam host's bounded startup budget. A cold library can need
+/// over a minute to publish its licenses after authentication succeeds.
+/// The supervisor must allow this budget plus time to deliver the result.
+pub const HOST_STARTUP_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(180);
+
 #[derive(Clone, Zeroize, ZeroizeOnDrop)]
 pub struct Credentials {
     pub steam_id: u64,
