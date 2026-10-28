@@ -212,7 +212,7 @@ pub fn serve(
                 )?;
             }
         }
-        if !ready && deadline.elapsed() > Duration::from_secs(45) {
+        if !ready && deadline.elapsed() > game_runtime::protocol::HOST_STARTUP_TIMEOUT {
             emit(
                 output,
                 &Event::Failed {
