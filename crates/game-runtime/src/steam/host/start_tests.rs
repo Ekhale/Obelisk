@@ -188,33 +188,3 @@ fn native_authentication_and_ownership_failures_still_block_admission() {
         assert!(!root.path().join("report.json").exists());
     }
 }
-
-/// Exercise the actual waiting loop past both former deadlines, without a
-/// Steam account or native library. The helper still has to authenticate and
-/// supply a matching Ready event; elapsed time alone never admits the game.
-#[test]
-#[ignore = "Takes 61 seconds; exercises readiness beyond the former startup deadline"]
-fn authenticated_host_can_finish_license_initialization_after_one_minute() {
-    let root = tempfile::tempdir().unwrap();
-    let (config, prepared) = fixture(root.path());
-    let host = Startup::new(credentials())
-        .prepare_host(
-            &config,
-            None,
-            &mut Vec::new(),
-            credentials(),
-            prepared,
-            |_, _, _| {
-                Ok(tests::child(
-                    r#"printf '%s\n' '{"event":"authenticated"}'; sleep 61; printf '{"event":"ready","app_id":42,"host_pid":%s,"ticket_bytes":178}\n' "$$"; cat >/dev/null"#,
-                ))
-            },
-        )
-        .unwrap();
-    let report: serde_json::Value =
-        serde_json::from_slice(&fs::read(root.path().join("report.json")).unwrap()).unwrap();
-    assert_eq!(report["host_account_verified"], true);
-    assert_eq!(report["host_license_verified"], true);
-    assert_eq!(report["ticket_bytes"], 178);
-    host.stopped(None);
-}

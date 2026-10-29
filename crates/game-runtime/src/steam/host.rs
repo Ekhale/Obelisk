@@ -208,8 +208,7 @@ impl Startup {
         let mut authenticated = false;
         loop {
             self.check_cancelled()?;
-            // Let the native host finish its startup budget and deliver its result.
-            if start.elapsed() > protocol::HOST_STARTUP_TIMEOUT + Duration::from_secs(10) {
+            if start.elapsed() > protocol::SUPERVISOR_STARTUP_TIMEOUT {
                 return Err(Error::Timeout);
             }
             let event = host.next(Duration::from_millis(50))?;
